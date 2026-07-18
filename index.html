@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Secure member portal powered by Supabase authentication.">
+  <title>Member Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page-shell">
+    <section id="auth-view" class="auth-layout">
+      <div class="brand-panel">
+        <div class="brand-mark" aria-hidden="true">M</div>
+        <p class="eyebrow">Secure access</p>
+        <h1>Your member portal.</h1>
+        <p class="brand-copy">Create an account or sign in to access your private dashboard from any device.</p>
+        <div class="feature-list">
+          <span>Encrypted authentication</span>
+          <span>Persistent login</span>
+          <span>Password recovery</span>
+        </div>
+      </div>
+
+      <div class="auth-card">
+        <div class="tabs" role="tablist" aria-label="Account options">
+          <button id="login-tab" class="tab active" type="button" role="tab" aria-selected="true">Log in</button>
+          <button id="signup-tab" class="tab" type="button" role="tab" aria-selected="false">Create account</button>
+        </div>
+
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+
+        <form id="login-form" class="auth-form">
+          <div>
+            <label for="login-email">Email address</label>
+            <input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com">
+          </div>
+          <div>
+            <div class="label-row">
+              <label for="login-password">Password</label>
+              <button id="forgot-password" class="text-button" type="button">Forgot password?</button>
+            </div>
+            <input id="login-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Enter your password">
+          </div>
+          <button class="primary-button" type="submit">Log in</button>
+        </form>
+
+        <form id="signup-form" class="auth-form hidden">
+          <div>
+            <label for="signup-name">Name</label>
+            <input id="signup-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your name">
+          </div>
+          <div>
+            <label for="signup-email">Email address</label>
+            <input id="signup-email" type="email" autocomplete="email" required placeholder="you@example.com">
+          </div>
+          <div>
+            <label for="signup-password">Password</label>
+            <input id="signup-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+          </div>
+          <button class="primary-button" type="submit">Create account</button>
+          <p class="form-note">You may need to confirm your email before signing in.</p>
+        </form>
+
+        <form id="reset-form" class="auth-form hidden">
+          <button id="back-to-login" class="back-button" type="button">← Back to login</button>
+          <div>
+            <label for="reset-email">Email address</label>
+            <input id="reset-email" type="email" autocomplete="email" required placeholder="you@example.com">
+          </div>
+          <button class="primary-button" type="submit">Send reset link</button>
+        </form>
+
+        <form id="new-password-form" class="auth-form hidden">
+          <h2>Choose a new password</h2>
+          <div>
+            <label for="new-password">New password</label>
+            <input id="new-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
+          </div>
+          <button class="primary-button" type="submit">Update password</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="dashboard-view" class="dashboard hidden">
+      <header class="dashboard-header">
+        <div class="dashboard-brand">
+          <div class="brand-mark small" aria-hidden="true">M</div>
+          <div>
+            <p class="eyebrow">Member Portal</p>
+            <h1>Dashboard</h1>
+          </div>
+        </div>
+        <button id="logout-button" class="secondary-button" type="button">Log out</button>
+      </header>
+
+      <div class="welcome-card">
+        <p class="eyebrow">Account active</p>
+        <h2 id="welcome-heading">Welcome!</h2>
+        <p id="account-email" class="muted"></p>
+      </div>
+
+      <div class="dashboard-grid">
+        <article class="dashboard-card">
+          <span class="card-number">01</span>
+          <h3>Your content goes here</h3>
+          <p>This protected area is ready for the app, tools, records, or member resources you want to add.</p>
+        </article>
+        <article class="dashboard-card">
+          <span class="card-number">02</span>
+          <h3>Private by account</h3>
+          <p>Future database records can be secured so each member only sees their own information.</p>
+        </article>
+        <article class="dashboard-card">
+          <span class="card-number">03</span>
+          <h3>Works across devices</h3>
+          <p>Members can sign in from a phone, tablet, or computer and maintain their own session.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
