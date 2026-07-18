@@ -20,9 +20,13 @@ const loginTab = document.getElementById('login-tab');
 const signupTab = document.getElementById('signup-tab');
 const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
+const resendForm = document.getElementById('resend-form');
 const resetForm = document.getElementById('reset-form');
 const newPasswordForm = document.getElementById('new-password-form');
 const forgotPasswordButton = document.getElementById('forgot-password');
+const openResendButton = document.getElementById('open-resend-confirmation');
+const openResendSignupButton = document.getElementById('open-resend-confirmation-signup');
+const backFromResendButton = document.getElementById('back-from-resend');
 const backToLoginButton = document.getElementById('back-to-login');
 const logoutButton = document.getElementById('logout-button');
 const messageBox = document.getElementById('message');
@@ -51,6 +55,7 @@ function showAuthForm(name) {
   clearMessage();
   loginForm.classList.toggle('hidden', name !== 'login');
   signupForm.classList.toggle('hidden', name !== 'signup');
+  resendForm.classList.toggle('hidden', name !== 'resend');
   resetForm.classList.toggle('hidden', name !== 'reset');
   newPasswordForm.classList.toggle('hidden', name !== 'new-password');
 
@@ -77,9 +82,22 @@ function showLoggedOutView() {
   showAuthForm('login');
 }
 
+function openResendForm(email = '') {
+  showAuthForm('resend');
+  document.getElementById('resend-email').value = email;
+  document.getElementById('resend-email').focus();
+}
+
 loginTab.addEventListener('click', () => showAuthForm('login'));
 signupTab.addEventListener('click', () => showAuthForm('signup'));
 forgotPasswordButton.addEventListener('click', () => showAuthForm('reset'));
+openResendButton.addEventListener('click', () => {
+  openResendForm(document.getElementById('login-email').value.trim());
+});
+openResendSignupButton.addEventListener('click', () => {
+  openResendForm(document.getElementById('signup-email').value.trim());
+});
+backFromResendButton.addEventListener('click', () => showAuthForm('login'));
 backToLoginButton.addEventListener('click', () => showAuthForm('login'));
 
 loginForm.addEventListener('submit', async (event) => {
@@ -133,6 +151,31 @@ signupForm.addEventListener('submit', async (event) => {
   } else {
     showMessage('Account created. Check your email to confirm your address, then log in.');
   }
+});
+
+resendForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  clearMessage();
+
+  const button = resendForm.querySelector('button[type="submit"]');
+  const email = document.getElementById('resend-email').value.trim();
+  setButtonLoading(button, true, 'Sending…');
+
+  const { error } = await supabaseClient.auth.resend({
+    type: 'signup',
+    email,
+    options: {
+      emailRedirectTo: PRODUCTION_URL,
+    },
+  });
+
+  setButtonLoading(button, false);
+  if (error) {
+    showMessage(error.message, 'error');
+    return;
+  }
+
+  showMessage('A new confirmation email was sent. Check your inbox and spam folder.');
 });
 
 resetForm.addEventListener('submit', async (event) => {
