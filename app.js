@@ -1,6 +1,9 @@
 const SUPABASE_URL = 'https://vqxjedlvphxgndhfugqm.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_q3iDOodA4cXBa4MJLTsOIA_pb2l5Hz0';
 const PRODUCTION_URL = 'https://alexthezero.github.io/member-portal/';
+const AVATAR_BUCKET = 'avatars';
+const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
+const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
@@ -17,11 +20,17 @@ const resendForm = byId('resend-form');
 const resetForm = byId('reset-form');
 const newPasswordForm = byId('new-password-form');
 const profileForm = byId('profile-form');
+const avatarFileInput = byId('profile-avatar-file');
+const removePhotoButton = byId('remove-profile-photo');
+const selectedFileName = byId('selected-file-name');
 const messageBox = byId('message');
 const dashboardMessage = byId('dashboard-message');
 const logoutButton = byId('logout-button');
 const themeButton = byId('theme-button');
 let currentUser = null;
+let pendingAvatarFile = null;
+let removeExistingAvatar = false;
+let temporaryPreviewUrl = '';
 
 function showMessage(text, type = 'success', target = messageBox) {
   target.textContent = text;
@@ -44,6 +53,32 @@ function applyAvatar(element, avatarUrl, fallbackText) {
   element.textContent = fallbackText;
   element.style.backgroundImage = avatarUrl ? `url("${avatarUrl.replace(/"/g, '')}")` : '';
   element.style.color = avatarUrl ? 'transparent' : '';
+}
+function clearTemporaryPreview() {
+  if (temporaryPreviewUrl) URL.revokeObjectURL(temporaryPreviewUrl);
+  temporaryPreviewUrl = '';
+}
+function avatarExtension(file) {
+  const extensionByType = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+  };
+  return extensionByType[file.type] || 'jpg';
+}
+function currentAvatarUrl() {
+  return currentUser?.user_metadata?.avatar_url?.trim() || '';
+}
+function resetPhotoSelection() {
+  clearTemporaryPreview();
+  pendingAvatarFile = null;
+  removeExistingAvatar = false;
+  avatarFileInput.value = '';
+  selectedFileName.textContent = 'No photo selected';
+}
+function refreshPhotoControls() {
+  removePhotoButton.classList.toggle('hidden', !currentAvatarUrl() && !pendingAvatarFile);
 }
 
 function showAuthForm(name) {
@@ -84,10 +119,11 @@ function renderUser(user) {
   byId('profile-preview-name').textContent = displayName;
   byId('profile-preview-email').textContent = user.email || '';
   byId('profile-name').value = displayName;
-  byId('profile-avatar-url').value = avatarUrl;
   byId('profile-email').value = user.email || '';
   applyAvatar(byId('avatar-display'), avatarUrl, fallback);
   applyAvatar(byId('profile-avatar-preview'), avatarUrl, fallback);
+  resetPhotoSelection();
+  refreshPhotoControls();
 }
 
 function showDashboard(user) {
@@ -98,6 +134,7 @@ function showDashboard(user) {
 }
 function showLoggedOutView() {
   currentUser = null;
+  resetPhotoSelection();
   dashboardView.classList.add('hidden');
   authView.classList.remove('hidden');
   showAuthForm('login');
@@ -117,6 +154,52 @@ byId('back-from-resend').addEventListener('click', () => showAuthForm('login'));
 byId('back-to-login').addEventListener('click', () => showAuthForm('login'));
 document.querySelectorAll('.nav-button').forEach((button) => button.addEventListener('click', () => showPortalSection(button.dataset.section)));
 document.querySelectorAll('[data-open-section]').forEach((button) => button.addEventListener('click', () => showPortalSection(button.dataset.openSection)));
+
+avatarFileInput.addEventListener('change', () => {
+  clearMessage(dashboardMessage);
+  const file = avatarFileInput.files?.[0];
+  if (!file) {
+    resetPhotoSelection();
+    const fallback = initials(byId('profile-name').value, currentUser?.email);
+    applyAvatar(byId('profile-avatar-preview'), currentAvatarUrl(), fallback);
+    refreshPhotoControls();
+    return;
+  }
+  if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+    avatarFileInput.value = '';
+    showMessage('Please choose a JPG, PNG, WebP, or GIF image.', 'error', dashboardMessage);
+    return;
+  }
+  if (file.size > MAX_AVATAR_BYTES) {
+    avatarFileInput.value = '';
+    showMessage('The selected image is larger than 5 MB.', 'error', dashboardMessage);
+    return;
+  }
+  clearTemporaryPreview();
+  pendingAvatarFile = file;
+  removeExistingAvatar = false;
+  temporaryPreviewUrl = URL.createObjectURL(file);
+  selectedFileName.textContent = file.name;
+  applyAvatar(byId('profile-avatar-preview'), temporaryPreviewUrl, initials(byId('profile-name').value, currentUser?.email));
+  refreshPhotoControls();
+});
+
+removePhotoButton.addEventListener('click', () => {
+  clearTemporaryPreview();
+  pendingAvatarFile = null;
+  removeExistingAvatar = true;
+  avatarFileInput.value = '';
+  selectedFileName.textContent = 'Current photo will be removed';
+  applyAvatar(byId('profile-avatar-preview'), '', initials(byId('profile-name').value, currentUser?.email));
+  removePhotoButton.classList.add('hidden');
+});
+
+byId('profile-name').addEventListener('input', () => {
+  byId('profile-preview-name').textContent = byId('profile-name').value.trim() || 'Member';
+  if (!pendingAvatarFile && (removeExistingAvatar || !currentAvatarUrl())) {
+    applyAvatar(byId('profile-avatar-preview'), '', initials(byId('profile-name').value, currentUser?.email));
+  }
+});
 
 loginForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearMessage();
@@ -173,17 +256,40 @@ newPasswordForm.addEventListener('submit', async (event) => {
   window.setTimeout(() => window.history.replaceState({}, document.title, window.location.pathname), 800);
 });
 
+async function uploadAvatar(file) {
+  const extension = avatarExtension(file);
+  const filePath = `${currentUser.id}/profile.${extension}`;
+  const { error: uploadError } = await supabaseClient.storage.from(AVATAR_BUCKET).upload(filePath, file, {
+    cacheControl: '3600',
+    upsert: true,
+    contentType: file.type,
+  });
+  if (uploadError) throw uploadError;
+  const { data } = supabaseClient.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
+  return `${data.publicUrl}?v=${Date.now()}`;
+}
+
 profileForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearMessage(dashboardMessage);
   const button = profileForm.querySelector('button[type="submit"]');
   const fullName = byId('profile-name').value.trim();
-  const avatarUrl = byId('profile-avatar-url').value.trim();
-  setButtonLoading(button, true, 'Saving…');
-  const { data, error } = await supabaseClient.auth.updateUser({ data: { full_name: fullName, avatar_url: avatarUrl } });
-  setButtonLoading(button, false);
-  if (error) return showMessage(error.message, 'error', dashboardMessage);
-  renderUser(data.user);
-  showMessage('Your profile has been updated.', 'success', dashboardMessage);
+  let avatarUrl = removeExistingAvatar ? '' : currentAvatarUrl();
+  setButtonLoading(button, true, pendingAvatarFile ? 'Uploading…' : 'Saving…');
+
+  try {
+    if (pendingAvatarFile) avatarUrl = await uploadAvatar(pendingAvatarFile);
+    const { data, error } = await supabaseClient.auth.updateUser({ data: { full_name: fullName, avatar_url: avatarUrl } });
+    if (error) throw error;
+    renderUser(data.user);
+    showMessage('Your profile has been updated.', 'success', dashboardMessage);
+  } catch (error) {
+    const storageHint = /bucket|storage|row-level security|policy/i.test(error.message || '')
+      ? ' The Supabase avatars bucket or its upload policy may still need to be configured.'
+      : '';
+    showMessage(`${error.message || 'The profile could not be updated.'}${storageHint}`, 'error', dashboardMessage);
+  } finally {
+    setButtonLoading(button, false);
+  }
 });
 
 logoutButton.addEventListener('click', async () => {
