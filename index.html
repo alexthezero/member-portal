@@ -46,6 +46,7 @@
             <input id="login-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Enter your password">
           </div>
           <button class="primary-button" type="submit">Log in</button>
+          <button id="open-resend-confirmation" class="text-button" type="button">Didn't receive your confirmation email?</button>
         </form>
 
         <form id="signup-form" class="auth-form hidden">
@@ -63,6 +64,18 @@
           </div>
           <button class="primary-button" type="submit">Create account</button>
           <p class="form-note">You may need to confirm your email before signing in.</p>
+          <button id="open-resend-confirmation-signup" class="text-button" type="button">Resend confirmation email</button>
+        </form>
+
+        <form id="resend-form" class="auth-form hidden">
+          <button id="back-from-resend" class="back-button" type="button">← Back to login</button>
+          <h2>Resend confirmation email</h2>
+          <p class="form-note">Enter the email address you originally used to create your account.</p>
+          <div>
+            <label for="resend-email">Email address</label>
+            <input id="resend-email" type="email" autocomplete="email" required placeholder="you@example.com">
+          </div>
+          <button class="primary-button" type="submit">Resend confirmation</button>
         </form>
 
         <form id="reset-form" class="auth-form hidden">
