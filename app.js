@@ -1,5 +1,6 @@
 const SUPABASE_URL = 'https://vqxjedlvphxgndhfugqm.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_q3iDOodA4cXBa4MJLTsOIA_pb2l5Hz0';
+const PRODUCTION_URL = 'https://alexthezero.github.io/member-portal/';
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
@@ -111,13 +112,12 @@ signupForm.addEventListener('submit', async (event) => {
   const password = document.getElementById('signup-password').value;
   setButtonLoading(button, true, 'Creating account…');
 
-  const redirectUrl = `${window.location.origin}${window.location.pathname}`;
   const { data, error } = await supabaseClient.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: fullName },
-      emailRedirectTo: redirectUrl,
+      emailRedirectTo: PRODUCTION_URL,
     },
   });
 
@@ -141,11 +141,10 @@ resetForm.addEventListener('submit', async (event) => {
 
   const button = resetForm.querySelector('button[type="submit"]');
   const email = document.getElementById('reset-email').value.trim();
-  const redirectUrl = `${window.location.origin}${window.location.pathname}`;
   setButtonLoading(button, true, 'Sending…');
 
   const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-    redirectTo: redirectUrl,
+    redirectTo: PRODUCTION_URL,
   });
 
   setButtonLoading(button, false);
