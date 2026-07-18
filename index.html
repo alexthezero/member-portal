@@ -7,7 +7,7 @@
   <title>Member Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,9 +19,7 @@
         <h1>Your member portal.</h1>
         <p class="brand-copy">Create an account or sign in to access your private dashboard from any device.</p>
         <div class="feature-list">
-          <span>Encrypted authentication</span>
-          <span>Persistent login</span>
-          <span>Password recovery</span>
+          <span>Encrypted authentication</span><span>Persistent login</span><span>Password recovery</span>
         </div>
       </div>
 
@@ -30,69 +28,38 @@
           <button id="login-tab" class="tab active" type="button" role="tab" aria-selected="true">Log in</button>
           <button id="signup-tab" class="tab" type="button" role="tab" aria-selected="false">Create account</button>
         </div>
-
         <div id="message" class="message" role="status" aria-live="polite"></div>
 
         <form id="login-form" class="auth-form">
-          <div>
-            <label for="login-email">Email address</label>
-            <input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com">
-          </div>
-          <div>
-            <div class="label-row">
-              <label for="login-password">Password</label>
-              <button id="forgot-password" class="text-button" type="button">Forgot password?</button>
-            </div>
-            <input id="login-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Enter your password">
-          </div>
+          <div><label for="login-email">Email address</label><input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+          <div><div class="label-row"><label for="login-password">Password</label><button id="forgot-password" class="text-button" type="button">Forgot password?</button></div><input id="login-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Enter your password"></div>
           <button class="primary-button" type="submit">Log in</button>
           <button id="open-resend-confirmation" class="text-button" type="button">Didn't receive your confirmation email?</button>
         </form>
 
         <form id="signup-form" class="auth-form hidden">
-          <div>
-            <label for="signup-name">Name</label>
-            <input id="signup-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your name">
-          </div>
-          <div>
-            <label for="signup-email">Email address</label>
-            <input id="signup-email" type="email" autocomplete="email" required placeholder="you@example.com">
-          </div>
-          <div>
-            <label for="signup-password">Password</label>
-            <input id="signup-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
-          </div>
+          <div><label for="signup-name">Name</label><input id="signup-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your name"></div>
+          <div><label for="signup-email">Email address</label><input id="signup-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+          <div><label for="signup-password">Password</label><input id="signup-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></div>
           <button class="primary-button" type="submit">Create account</button>
           <p class="form-note">You may need to confirm your email before signing in.</p>
           <button id="open-resend-confirmation-signup" class="text-button" type="button">Resend confirmation email</button>
         </form>
 
         <form id="resend-form" class="auth-form hidden">
-          <button id="back-from-resend" class="back-button" type="button">← Back to login</button>
-          <h2>Resend confirmation email</h2>
-          <p class="form-note">Enter the email address you originally used to create your account.</p>
-          <div>
-            <label for="resend-email">Email address</label>
-            <input id="resend-email" type="email" autocomplete="email" required placeholder="you@example.com">
-          </div>
+          <button id="back-from-resend" class="back-button" type="button">← Back to login</button><h2>Resend confirmation email</h2><p class="form-note">Enter the email address you originally used.</p>
+          <div><label for="resend-email">Email address</label><input id="resend-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
           <button class="primary-button" type="submit">Resend confirmation</button>
         </form>
 
         <form id="reset-form" class="auth-form hidden">
           <button id="back-to-login" class="back-button" type="button">← Back to login</button>
-          <div>
-            <label for="reset-email">Email address</label>
-            <input id="reset-email" type="email" autocomplete="email" required placeholder="you@example.com">
-          </div>
+          <div><label for="reset-email">Email address</label><input id="reset-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
           <button class="primary-button" type="submit">Send reset link</button>
         </form>
 
         <form id="new-password-form" class="auth-form hidden">
-          <h2>Choose a new password</h2>
-          <div>
-            <label for="new-password">New password</label>
-            <input id="new-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters">
-          </div>
+          <h2>Choose a new password</h2><div><label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></div>
           <button class="primary-button" type="submit">Update password</button>
         </form>
       </div>
@@ -100,42 +67,52 @@
 
     <section id="dashboard-view" class="dashboard hidden">
       <header class="dashboard-header">
-        <div class="dashboard-brand">
-          <div class="brand-mark small" aria-hidden="true">M</div>
-          <div>
-            <p class="eyebrow">Member Portal</p>
-            <h1>Dashboard</h1>
-          </div>
-        </div>
-        <button id="logout-button" class="secondary-button" type="button">Log out</button>
+        <div class="dashboard-brand"><div class="brand-mark small" aria-hidden="true">M</div><div><p class="eyebrow">Member Portal</p><h1>Dashboard</h1></div></div>
+        <div class="header-actions"><button id="theme-button" class="icon-button" type="button" aria-label="Change theme">☀</button><button id="logout-button" class="secondary-button" type="button">Log out</button></div>
       </header>
 
-      <div class="welcome-card">
-        <p class="eyebrow">Account active</p>
-        <h2 id="welcome-heading">Welcome!</h2>
-        <p id="account-email" class="muted"></p>
-      </div>
+      <nav class="portal-nav" aria-label="Portal sections">
+        <button class="nav-button active" data-section="home" type="button">Home</button>
+        <button class="nav-button" data-section="resources" type="button">Resources</button>
+        <button class="nav-button" data-section="profile" type="button">My profile</button>
+      </nav>
 
-      <div class="dashboard-grid">
-        <article class="dashboard-card">
-          <span class="card-number">01</span>
-          <h3>Your content goes here</h3>
-          <p>This protected area is ready for the app, tools, records, or member resources you want to add.</p>
-        </article>
-        <article class="dashboard-card">
-          <span class="card-number">02</span>
-          <h3>Private by account</h3>
-          <p>Future database records can be secured so each member only sees their own information.</p>
-        </article>
-        <article class="dashboard-card">
-          <span class="card-number">03</span>
-          <h3>Works across devices</h3>
-          <p>Members can sign in from a phone, tablet, or computer and maintain their own session.</p>
-        </article>
-      </div>
+      <div id="dashboard-message" class="message" role="status" aria-live="polite"></div>
+
+      <section id="section-home" class="portal-section">
+        <div class="welcome-card">
+          <div class="profile-summary"><div id="avatar-display" class="avatar-display">M</div><div><div class="status-row"><span class="status-dot"></span><span>Account active</span><span id="role-badge" class="role-badge">Member</span></div><h2 id="welcome-heading">Welcome!</h2><p id="account-email" class="muted"></p></div></div>
+        </div>
+        <div class="dashboard-grid">
+          <article class="dashboard-card"><span class="card-number">01</span><h3>Member resources</h3><p>Access private documents, links, updates, and other material shared with portal members.</p><button class="card-link" data-open-section="resources" type="button">View resources →</button></article>
+          <article class="dashboard-card"><span class="card-number">02</span><h3>Your profile</h3><p>Keep your display name and profile image current across the member portal.</p><button class="card-link" data-open-section="profile" type="button">Edit profile →</button></article>
+          <article class="dashboard-card"><span class="card-number">03</span><h3>Secure access</h3><p>Your login session is protected by Supabase authentication and works across your devices.</p></article>
+        </div>
+      </section>
+
+      <section id="section-resources" class="portal-section hidden">
+        <div class="section-heading"><div><p class="eyebrow">Private content</p><h2>Member resources</h2><p class="muted">Only signed-in members can access this section.</p></div></div>
+        <div class="resource-grid">
+          <article class="resource-card"><div class="resource-icon">📄</div><h3>Documents</h3><p>Add downloadable guides, forms, policies, or member files here.</p><span class="coming-soon">Ready for content</span></article>
+          <article class="resource-card"><div class="resource-icon">▶</div><h3>Videos</h3><p>Add private training, announcements, walkthroughs, or recorded updates.</p><span class="coming-soon">Ready for content</span></article>
+          <article class="resource-card"><div class="resource-icon">🔗</div><h3>Useful links</h3><p>Collect important member links and frequently used online resources.</p><span class="coming-soon">Ready for content</span></article>
+        </div>
+      </section>
+
+      <section id="section-profile" class="portal-section hidden">
+        <div class="section-heading"><div><p class="eyebrow">Account settings</p><h2>My profile</h2><p class="muted">Changes are saved securely to your Supabase account.</p></div></div>
+        <div class="profile-layout">
+          <aside class="profile-preview"><div id="profile-avatar-preview" class="avatar-display large">M</div><h3 id="profile-preview-name">Member</h3><p id="profile-preview-email" class="muted"></p><span id="profile-role" class="role-badge">Member</span></aside>
+          <form id="profile-form" class="settings-card">
+            <div><label for="profile-name">Display name</label><input id="profile-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your name"></div>
+            <div><label for="profile-avatar-url">Profile image URL</label><input id="profile-avatar-url" type="url" inputmode="url" placeholder="https://example.com/photo.jpg"><p class="field-help">Paste a direct link to an image. Leave blank to use your initials.</p></div>
+            <div><label for="profile-email">Email address</label><input id="profile-email" type="email" disabled><p class="field-help">Email changes are disabled in this version for account safety.</p></div>
+            <button class="primary-button" type="submit">Save profile</button>
+          </form>
+        </div>
+      </section>
     </section>
   </main>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
