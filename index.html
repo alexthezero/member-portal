@@ -3,109 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Secure member portal powered by Supabase authentication.">
-  <title>Member Portal</title>
+  <meta name="description" content="Campfire is a private online gathering place for family stories, memories, and time capsules.">
+  <title>Campfire — Your family's private place to gather</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <main class="page-shell">
     <section id="auth-view" class="auth-layout">
       <div class="brand-panel">
-        <div class="brand-mark" aria-hidden="true">M</div>
-        <p class="eyebrow">Secure access</p>
-        <h1>Your member portal.</h1>
-        <p class="brand-copy">Create an account or sign in to access your private dashboard from any device.</p>
-        <div class="feature-list"><span>Encrypted authentication</span><span>Persistent login</span><span>Password recovery</span></div>
+        <div class="brand-mark" aria-hidden="true">🔥</div>
+        <p class="eyebrow">Private by design</p>
+        <h1>Every family has stories.</h1>
+        <p class="brand-copy">Campfire gives yours a warm, private place to share updates, preserve memories, and leave messages for the future.</p>
+        <div class="feature-list"><span>Family-only feed</span><span>Private posts</span><span>Time capsules</span></div>
       </div>
       <div class="auth-card">
-        <div class="tabs" role="tablist" aria-label="Account options">
-          <button id="login-tab" class="tab active" type="button" role="tab" aria-selected="true">Log in</button>
-          <button id="signup-tab" class="tab" type="button" role="tab" aria-selected="false">Create account</button>
-        </div>
-        <div id="message" class="message" role="status" aria-live="polite"></div>
+        <div class="tabs" role="tablist"><button id="login-tab" class="tab active" type="button">Log in</button><button id="signup-tab" class="tab" type="button">Create account</button></div>
+        <div id="message" class="message" role="status"></div>
         <form id="login-form" class="auth-form">
           <div><label for="login-email">Email address</label><input id="login-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
-          <div><div class="label-row"><label for="login-password">Password</label><button id="forgot-password" class="text-button" type="button">Forgot password?</button></div><input id="login-password" type="password" autocomplete="current-password" required minlength="6" placeholder="Enter your password"></div>
-          <button class="primary-button" type="submit">Log in</button>
-          <button id="open-resend-confirmation" class="text-button" type="button">Didn't receive your confirmation email?</button>
+          <div><div class="label-row"><label for="login-password">Password</label><button id="forgot-password" class="text-button" type="button">Forgot password?</button></div><input id="login-password" type="password" autocomplete="current-password" required minlength="6"></div>
+          <button class="primary-button" type="submit">Enter Campfire</button>
+          <button id="open-resend-confirmation" class="text-button" type="button">Resend confirmation email</button>
         </form>
         <form id="signup-form" class="auth-form hidden">
-          <div><label for="signup-name">Name</label><input id="signup-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your name"></div>
-          <div><label for="signup-email">Email address</label><input id="signup-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
-          <div><label for="signup-password">Password</label><input id="signup-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></div>
-          <button class="primary-button" type="submit">Create account</button>
-          <p class="form-note">You may need to confirm your email before signing in.</p>
+          <div><label for="signup-name">Your name</label><input id="signup-name" type="text" required maxlength="80"></div>
+          <div><label for="signup-code">Campfire code</label><input id="signup-code" type="text" required maxlength="40" placeholder="Example: PINE-CREEK"><p class="field-help">Ask your family admin for the private code.</p></div>
+          <div><label for="signup-email">Email address</label><input id="signup-email" type="email" required></div>
+          <div><label for="signup-password">Password</label><input id="signup-password" type="password" required minlength="8"></div>
+          <button class="primary-button" type="submit">Join the Campfire</button>
           <button id="open-resend-confirmation-signup" class="text-button" type="button">Resend confirmation email</button>
         </form>
-        <form id="resend-form" class="auth-form hidden">
-          <button id="back-from-resend" class="back-button" type="button">← Back to login</button><h2>Resend confirmation email</h2><p class="form-note">Enter the email address you originally used.</p>
-          <div><label for="resend-email">Email address</label><input id="resend-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
-          <button class="primary-button" type="submit">Resend confirmation</button>
-        </form>
-        <form id="reset-form" class="auth-form hidden">
-          <button id="back-to-login" class="back-button" type="button">← Back to login</button>
-          <div><label for="reset-email">Email address</label><input id="reset-email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
-          <button class="primary-button" type="submit">Send reset link</button>
-        </form>
-        <form id="new-password-form" class="auth-form hidden">
-          <h2>Choose a new password</h2><div><label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" required minlength="8" placeholder="At least 8 characters"></div>
-          <button class="primary-button" type="submit">Update password</button>
-        </form>
+        <form id="resend-form" class="auth-form hidden"><button id="back-from-resend" class="back-button" type="button">← Back</button><h2>Resend confirmation</h2><input id="resend-email" type="email" required placeholder="Email address"><button class="primary-button" type="submit">Send email</button></form>
+        <form id="reset-form" class="auth-form hidden"><button id="back-to-login" class="back-button" type="button">← Back</button><h2>Reset password</h2><input id="reset-email" type="email" required placeholder="Email address"><button class="primary-button" type="submit">Send reset link</button></form>
+        <form id="new-password-form" class="auth-form hidden"><h2>Choose a new password</h2><input id="new-password" type="password" required minlength="8"><button class="primary-button" type="submit">Update password</button></form>
       </div>
     </section>
 
     <section id="dashboard-view" class="dashboard hidden">
       <header class="dashboard-header">
-        <div class="dashboard-brand"><div class="brand-mark small" aria-hidden="true">M</div><div><p class="eyebrow">Member Portal</p><h1>Dashboard</h1></div></div>
-        <div class="header-actions"><button id="theme-button" class="icon-button" type="button" aria-label="Change theme">☀</button><button id="logout-button" class="secondary-button" type="button">Log out</button></div>
+        <div class="dashboard-brand"><div class="brand-mark small">🔥</div><div><p class="eyebrow">Our private family space</p><h1>Campfire</h1></div></div>
+        <div class="header-actions"><button id="theme-button" class="icon-button" type="button">☀</button><button id="logout-button" class="secondary-button" type="button">Log out</button></div>
       </header>
-      <nav class="portal-nav" aria-label="Portal sections">
-        <button class="nav-button active" data-section="home" type="button">Home</button>
-        <button class="nav-button" data-section="resources" type="button">Resources</button>
-        <button class="nav-button" data-section="profile" type="button">My profile</button>
+      <nav class="portal-nav">
+        <button class="nav-button active" data-section="feed">Campfire Feed</button>
+        <button class="nav-button" data-section="private">My Private Posts</button>
+        <button class="nav-button" data-section="capsules">Time Capsules</button>
+        <button class="nav-button" data-section="members">Family</button>
+        <button class="nav-button" data-section="profile">My Profile</button>
       </nav>
-      <div id="dashboard-message" class="message" role="status" aria-live="polite"></div>
+      <div id="dashboard-message" class="message" role="status"></div>
 
-      <section id="section-home" class="portal-section">
-        <div class="welcome-card"><div class="profile-summary"><div id="avatar-display" class="avatar-display">M</div><div><div class="status-row"><span class="status-dot"></span><span>Account active</span><span id="role-badge" class="role-badge">Member</span></div><h2 id="welcome-heading">Welcome!</h2><p id="account-email" class="muted"></p></div></div></div>
-        <div class="dashboard-grid">
-          <article class="dashboard-card"><span class="card-number">01</span><h3>Member resources</h3><p>Access private documents, links, updates, and other material shared with portal members.</p><button class="card-link" data-open-section="resources" type="button">View resources →</button></article>
-          <article class="dashboard-card"><span class="card-number">02</span><h3>Your profile</h3><p>Keep your display name and profile photo current across the member portal.</p><button class="card-link" data-open-section="profile" type="button">Edit profile →</button></article>
-          <article class="dashboard-card"><span class="card-number">03</span><h3>Secure access</h3><p>Your login session is protected by Supabase authentication and works across your devices.</p></article>
+      <section id="section-feed" class="portal-section">
+        <div class="hero-card"><div><p class="eyebrow">Welcome home</p><h2 id="welcome-heading">Good evening.</h2><p>Share a story, photo, milestone, or update with the people who matter most.</p></div><div id="avatar-display" class="avatar-display">M</div></div>
+        <div class="content-grid">
+          <div>
+            <form id="post-form" class="composer card">
+              <textarea id="post-content" rows="4" maxlength="3000" required placeholder="What would you like to share with the family?"></textarea>
+              <div class="composer-actions"><select id="post-visibility"><option value="family">Family</option><option value="private">Only me</option></select><button class="primary-button" type="submit">Share post</button></div>
+            </form>
+            <div id="feed-list" class="feed-list"></div>
+          </div>
+          <aside class="side-stack">
+            <article class="card memory-card"><span class="card-icon">✨</span><p class="eyebrow">Memory Tonight</p><h3 id="memory-title">Your memories will appear here.</h3><p id="memory-copy" class="muted">As your Campfire grows, old posts will be resurfaced for the family.</p></article>
+            <article class="card"><p class="eyebrow">Coming up</p><h3>Family Gatherings</h3><p class="muted">Birthdays, reunions, anniversaries, and holidays will live here next.</p></article>
+          </aside>
         </div>
       </section>
 
-      <section id="section-resources" class="portal-section hidden">
-        <div class="section-heading"><div><p class="eyebrow">Private content</p><h2>Member resources</h2><p class="muted">Only signed-in members can access this section.</p></div></div>
-        <div class="resource-grid">
-          <article class="resource-card"><div class="resource-icon">📄</div><h3>Documents</h3><p>Add downloadable guides, forms, policies, or member files here.</p><span class="coming-soon">Ready for content</span></article>
-          <article class="resource-card"><div class="resource-icon">▶</div><h3>Videos</h3><p>Add private training, announcements, walkthroughs, or recorded updates.</p><span class="coming-soon">Ready for content</span></article>
-          <article class="resource-card"><div class="resource-icon">🔗</div><h3>Useful links</h3><p>Collect important member links and frequently used online resources.</p><span class="coming-soon">Ready for content</span></article>
+      <section id="section-private" class="portal-section hidden"><div class="section-heading"><div><p class="eyebrow">Only you can see these</p><h2>My Private Posts</h2></div></div><div id="private-list" class="feed-list narrow"></div></section>
+
+      <section id="section-capsules" class="portal-section hidden">
+        <div class="section-heading"><div><p class="eyebrow">Messages for the future</p><h2>Time Capsules</h2><p class="muted">Write something meaningful today and choose when it may be opened.</p></div></div>
+        <div class="capsule-layout">
+          <form id="capsule-form" class="card settings-card">
+            <div><label for="capsule-title">Capsule title</label><input id="capsule-title" required maxlength="120" placeholder="For Emery on her 18th birthday"></div>
+            <div><label for="capsule-message">Message</label><textarea id="capsule-message" rows="7" required maxlength="10000" placeholder="Write a letter, memory, story, or piece of advice..."></textarea></div>
+            <div class="two-col"><div><label for="capsule-recipient">Recipient</label><input id="capsule-recipient" maxlength="120" placeholder="Name or whole family"></div><div><label for="capsule-date">Unlock date</label><input id="capsule-date" type="date" required></div></div>
+            <button class="primary-button" type="submit">Seal Time Capsule</button>
+          </form>
+          <div><div id="capsule-list" class="capsule-list"></div></div>
         </div>
       </section>
+
+      <section id="section-members" class="portal-section hidden"><div class="section-heading"><div><p class="eyebrow">Around the fire</p><h2>Family Members</h2></div></div><div id="member-list" class="member-grid"></div></section>
 
       <section id="section-profile" class="portal-section hidden">
-        <div class="section-heading"><div><p class="eyebrow">Account settings</p><h2>My profile</h2><p class="muted">Changes are saved securely to your Supabase account.</p></div></div>
-        <div class="profile-layout">
-          <aside class="profile-preview"><div id="profile-avatar-preview" class="avatar-display large">M</div><h3 id="profile-preview-name">Member</h3><p id="profile-preview-email" class="muted"></p><span id="profile-role" class="role-badge">Member</span></aside>
-          <form id="profile-form" class="settings-card">
-            <div><label for="profile-name">Display name</label><input id="profile-name" type="text" autocomplete="name" required maxlength="80" placeholder="Your name"></div>
-            <div>
-              <label>Profile picture</label>
-              <div class="photo-upload-row">
-                <label for="profile-avatar-file" class="upload-button">Choose photo</label>
-                <input id="profile-avatar-file" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
-                <span id="selected-file-name" class="selected-file-name">No photo selected</span>
-              </div>
-              <p class="field-help">Choose a JPG, PNG, WebP, or GIF up to 5 MB. Your new photo will be uploaded when you save.</p>
-              <button id="remove-profile-photo" class="text-button remove-photo-button hidden" type="button">Remove current photo</button>
-            </div>
-            <div><label for="profile-email">Email address</label><input id="profile-email" type="email" disabled><p class="field-help">Email changes are disabled in this version for account safety.</p></div>
-            <button class="primary-button" type="submit">Save profile</button>
-          </form>
+        <div class="section-heading"><div><p class="eyebrow">Your place in the family</p><h2>My Profile</h2></div></div>
+        <div class="profile-layout"><aside class="profile-preview card"><div id="profile-avatar-preview" class="avatar-display large">M</div><h3 id="profile-preview-name">Member</h3><p id="profile-preview-email" class="muted"></p></aside>
+          <form id="profile-form" class="settings-card card"><div><label for="profile-name">Display name</label><input id="profile-name" required maxlength="80"></div><div><label>Profile picture</label><div class="photo-upload-row"><label for="profile-avatar-file" class="upload-button">Choose photo</label><input id="profile-avatar-file" class="visually-hidden" type="file" accept="image/*"><span id="selected-file-name" class="muted">No photo selected</span></div><button id="remove-profile-photo" class="text-button hidden" type="button">Remove photo</button></div><div><label for="profile-email">Email</label><input id="profile-email" disabled></div><button class="primary-button" type="submit">Save profile</button></form>
         </div>
       </section>
     </section>
