@@ -49,17 +49,42 @@
 }
 
 .brand-lockup {
-  margin-bottom: 58px !important;
+  position: relative !important;
+  display: block !important;
+  margin-bottom: 34px !important;
+  width: fit-content !important;
 }
 
-.brand-symbol {
-  width: 44px !important;
-  height: 44px !important;
-  border-radius: 14px !important;
-  border: 1px solid rgba(255,151,49,.72) !important;
-  background: rgba(8,8,8,.46) !important;
-  color: #ffb35f !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,.24) !important;
+.brand-symbol,
+.brand-status {
+  display: none !important;
+}
+
+.brand-name {
+  position: relative !important;
+  display: inline-block !important;
+  font-family: "DM Serif Display", serif !important;
+  font-size: clamp(4.7rem, 10vw, 8.4rem) !important;
+  line-height: .86 !important;
+  letter-spacing: -.055em !important;
+  color: #fff1d5 !important;
+  text-shadow:
+    0 3px 0 rgba(117,49,16,.28),
+    0 0 22px rgba(255,117,31,.24),
+    0 12px 42px rgba(0,0,0,.72) !important;
+}
+
+.brand-name::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 57% !important;
+  bottom: -.12em !important;
+  width: 1.25em !important;
+  height: .08em !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, transparent, #ffad55 22%, #ffe0a2 55%, transparent) !important;
+  transform: translateX(-50%) rotate(-3deg) !important;
+  box-shadow: 0 0 16px rgba(255,130,44,.34) !important;
 }
 
 .hero-copy {
@@ -141,6 +166,10 @@
     background-position: 58% center !important;
   }
 
+  .brand-name {
+    font-size: clamp(4.2rem, 15vw, 6.8rem) !important;
+  }
+
   .auth-card {
     width: calc(100% - 28px) !important;
     margin: -228px auto 20px !important;
@@ -156,7 +185,12 @@
   }
 
   .brand-lockup {
-    margin-bottom: 38px !important;
+    margin-bottom: 26px !important;
+  }
+
+  .brand-name {
+    font-size: clamp(4rem, 18vw, 5.9rem) !important;
+    line-height: .88 !important;
   }
 
   .hero-copy h1 {
