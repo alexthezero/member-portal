@@ -27,37 +27,58 @@ const messageBox = byId('message');
 const dashboardMessage = byId('dashboard-message');
 const logoutButton = byId('logout-button');
 const themeButton = byId('theme-button');
+
 let currentUser = null;
 let pendingAvatarFile = null;
 let removeExistingAvatar = false;
 let temporaryPreviewUrl = '';
+let resolvedAvatarUrl = '';
 
 function showMessage(text, type = 'success', target = messageBox) {
   target.textContent = text;
   target.className = `message show ${type}`;
 }
+
 function clearMessage(target = messageBox) {
   target.textContent = '';
   target.className = 'message';
 }
+
 function setButtonLoading(button, isLoading, loadingText) {
   if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
   button.disabled = isLoading;
   button.textContent = isLoading ? loadingText : button.dataset.originalText;
 }
+
 function initials(name, email) {
   const source = name?.trim() || email?.split('@')[0] || 'M';
   return source.split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'M';
 }
+
 function applyAvatar(element, avatarUrl, fallbackText) {
   element.textContent = fallbackText;
-  element.style.backgroundImage = avatarUrl ? `url("${avatarUrl.replace(/"/g, '')}")` : '';
-  element.style.color = avatarUrl ? 'transparent' : '';
+  element.style.backgroundImage = '';
+  element.style.color = '';
+
+  if (!avatarUrl) return;
+
+  const image = new Image();
+  image.onload = () => {
+    element.style.backgroundImage = `url("${avatarUrl.replace(/"/g, '')}")`;
+    element.style.color = 'transparent';
+  };
+  image.onerror = () => {
+    element.style.backgroundImage = '';
+    element.style.color = '';
+  };
+  image.src = avatarUrl;
 }
+
 function clearTemporaryPreview() {
   if (temporaryPreviewUrl) URL.revokeObjectURL(temporaryPreviewUrl);
   temporaryPreviewUrl = '';
 }
+
 function avatarExtension(file) {
   const extensionByType = {
     'image/jpeg': 'jpg',
@@ -67,9 +88,49 @@ function avatarExtension(file) {
   };
   return extensionByType[file.type] || 'jpg';
 }
-function currentAvatarUrl() {
-  return currentUser?.user_metadata?.avatar_url?.trim() || '';
+
+function currentAvatarPath() {
+  return currentUser?.user_metadata?.avatar_path?.trim() || '';
 }
+
+function currentAvatarUrl() {
+  return resolvedAvatarUrl || currentUser?.user_metadata?.avatar_url?.trim() || '';
+}
+
+async function signedAvatarUrl(path) {
+  if (!path) return '';
+  const { data, error } = await supabaseClient.storage
+    .from(AVATAR_BUCKET)
+    .createSignedUrl(path, 60 * 60 * 24 * 30);
+  if (error) throw error;
+  return `${data.signedUrl}&v=${Date.now()}`;
+}
+
+async function locateExistingAvatar(user) {
+  const storedPath = user.user_metadata?.avatar_path?.trim();
+  if (storedPath) {
+    try {
+      return { path: storedPath, url: await signedAvatarUrl(storedPath) };
+    } catch (_) {
+      // Continue to folder lookup when an old path no longer exists.
+    }
+  }
+
+  const { data: files, error } = await supabaseClient.storage
+    .from(AVATAR_BUCKET)
+    .list(user.id, { limit: 20, sortBy: { column: 'updated_at', order: 'desc' } });
+
+  if (error || !files?.length) {
+    return { path: '', url: user.user_metadata?.avatar_url?.trim() || '' };
+  }
+
+  const file = files.find((item) => item.name && !item.name.startsWith('.'));
+  if (!file) return { path: '', url: user.user_metadata?.avatar_url?.trim() || '' };
+
+  const path = `${user.id}/${file.name}`;
+  return { path, url: await signedAvatarUrl(path) };
+}
+
 function resetPhotoSelection() {
   clearTemporaryPreview();
   pendingAvatarFile = null;
@@ -77,8 +138,9 @@ function resetPhotoSelection() {
   avatarFileInput.value = '';
   selectedFileName.textContent = 'No photo selected';
 }
+
 function refreshPhotoControls() {
-  removePhotoButton.classList.toggle('hidden', !currentAvatarUrl() && !pendingAvatarFile);
+  removePhotoButton.classList.toggle('hidden', !currentAvatarPath() && !currentAvatarUrl() && !pendingAvatarFile);
 }
 
 function showAuthForm(name) {
@@ -104,11 +166,10 @@ function showPortalSection(name) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function renderUser(user) {
+async function renderUser(user) {
   currentUser = user;
   const metadata = user.user_metadata || {};
   const displayName = metadata.full_name?.trim() || 'Member';
-  const avatarUrl = metadata.avatar_url?.trim() || '';
   const role = user.app_metadata?.role || 'member';
   const fallback = initials(displayName, user.email);
 
@@ -120,25 +181,47 @@ function renderUser(user) {
   byId('profile-preview-email').textContent = user.email || '';
   byId('profile-name').value = displayName;
   byId('profile-email').value = user.email || '';
-  applyAvatar(byId('avatar-display'), avatarUrl, fallback);
-  applyAvatar(byId('profile-avatar-preview'), avatarUrl, fallback);
+
+  applyAvatar(byId('avatar-display'), '', fallback);
+  applyAvatar(byId('profile-avatar-preview'), '', fallback);
+
+  try {
+    const avatar = await locateExistingAvatar(user);
+    resolvedAvatarUrl = avatar.url;
+    applyAvatar(byId('avatar-display'), avatar.url, fallback);
+    applyAvatar(byId('profile-avatar-preview'), avatar.url, fallback);
+
+    if (avatar.path && avatar.path !== metadata.avatar_path) {
+      const { data } = await supabaseClient.auth.updateUser({
+        data: { ...metadata, avatar_path: avatar.path, avatar_url: '' },
+      });
+      if (data?.user) currentUser = data.user;
+    }
+  } catch (error) {
+    resolvedAvatarUrl = '';
+    console.warn('Avatar could not be loaded:', error);
+  }
+
   resetPhotoSelection();
   refreshPhotoControls();
 }
 
-function showDashboard(user) {
+async function showDashboard(user) {
   authView.classList.add('hidden');
   dashboardView.classList.remove('hidden');
-  renderUser(user);
+  await renderUser(user);
   showPortalSection('home');
 }
+
 function showLoggedOutView() {
   currentUser = null;
+  resolvedAvatarUrl = '';
   resetPhotoSelection();
   dashboardView.classList.add('hidden');
   authView.classList.remove('hidden');
   showAuthForm('login');
 }
+
 function openResendForm(email = '') {
   showAuthForm('resend');
   byId('resend-email').value = email;
@@ -160,8 +243,7 @@ avatarFileInput.addEventListener('change', () => {
   const file = avatarFileInput.files?.[0];
   if (!file) {
     resetPhotoSelection();
-    const fallback = initials(byId('profile-name').value, currentUser?.email);
-    applyAvatar(byId('profile-avatar-preview'), currentAvatarUrl(), fallback);
+    applyAvatar(byId('profile-avatar-preview'), currentAvatarUrl(), initials(byId('profile-name').value, currentUser?.email));
     refreshPhotoControls();
     return;
   }
@@ -216,7 +298,8 @@ signupForm.addEventListener('submit', async (event) => {
   const button = signupForm.querySelector('button[type="submit"]');
   setButtonLoading(button, true, 'Creating account…');
   const { data, error } = await supabaseClient.auth.signUp({
-    email: byId('signup-email').value.trim(), password: byId('signup-password').value,
+    email: byId('signup-email').value.trim(),
+    password: byId('signup-password').value,
     options: { data: { full_name: byId('signup-name').value.trim() }, emailRedirectTo: PRODUCTION_URL },
   });
   setButtonLoading(button, false);
@@ -242,7 +325,8 @@ resetForm.addEventListener('submit', async (event) => {
   const { error } = await supabaseClient.auth.resetPasswordForEmail(byId('reset-email').value.trim(), { redirectTo: PRODUCTION_URL });
   setButtonLoading(button, false);
   if (error) return showMessage(error.message, 'error');
-  resetForm.reset(); showMessage('Password reset link sent. Check your email.');
+  resetForm.reset();
+  showMessage('Password reset link sent. Check your email.');
 });
 
 newPasswordForm.addEventListener('submit', async (event) => {
@@ -252,39 +336,49 @@ newPasswordForm.addEventListener('submit', async (event) => {
   const { error } = await supabaseClient.auth.updateUser({ password: byId('new-password').value });
   setButtonLoading(button, false);
   if (error) return showMessage(error.message, 'error');
-  newPasswordForm.reset(); showMessage('Password updated successfully.');
+  newPasswordForm.reset();
+  showMessage('Password updated successfully.');
   window.setTimeout(() => window.history.replaceState({}, document.title, window.location.pathname), 800);
 });
 
 async function uploadAvatar(file) {
   const extension = avatarExtension(file);
   const filePath = `${currentUser.id}/profile.${extension}`;
-  const { error: uploadError } = await supabaseClient.storage.from(AVATAR_BUCKET).upload(filePath, file, {
+  const { error } = await supabaseClient.storage.from(AVATAR_BUCKET).upload(filePath, file, {
     cacheControl: '3600',
     upsert: true,
     contentType: file.type,
   });
-  if (uploadError) throw uploadError;
-  const { data } = supabaseClient.storage.from(AVATAR_BUCKET).getPublicUrl(filePath);
-  return `${data.publicUrl}?v=${Date.now()}`;
+  if (error) throw error;
+  return { path: filePath, url: await signedAvatarUrl(filePath) };
 }
 
 profileForm.addEventListener('submit', async (event) => {
   event.preventDefault(); clearMessage(dashboardMessage);
   const button = profileForm.querySelector('button[type="submit"]');
   const fullName = byId('profile-name').value.trim();
+  let avatarPath = removeExistingAvatar ? '' : currentAvatarPath();
   let avatarUrl = removeExistingAvatar ? '' : currentAvatarUrl();
   setButtonLoading(button, true, pendingAvatarFile ? 'Uploading…' : 'Saving…');
 
   try {
-    if (pendingAvatarFile) avatarUrl = await uploadAvatar(pendingAvatarFile);
-    const { data, error } = await supabaseClient.auth.updateUser({ data: { full_name: fullName, avatar_url: avatarUrl } });
+    if (pendingAvatarFile) {
+      const uploaded = await uploadAvatar(pendingAvatarFile);
+      avatarPath = uploaded.path;
+      avatarUrl = uploaded.url;
+    }
+
+    const { data, error } = await supabaseClient.auth.updateUser({
+      data: { full_name: fullName, avatar_path: avatarPath, avatar_url: '' },
+    });
     if (error) throw error;
-    renderUser(data.user);
+
+    resolvedAvatarUrl = avatarUrl;
+    await renderUser(data.user);
     showMessage('Your profile has been updated.', 'success', dashboardMessage);
   } catch (error) {
     const storageHint = /bucket|storage|row-level security|policy/i.test(error.message || '')
-      ? ' The Supabase avatars bucket or its upload policy may still need to be configured.'
+      ? ' The Supabase avatars bucket or its storage policies may still need to be configured.'
       : '';
     showMessage(`${error.message || 'The profile could not be updated.'}${storageHint}`, 'error', dashboardMessage);
   } finally {
@@ -305,18 +399,28 @@ function setTheme(theme) {
   themeButton.textContent = theme === 'light' ? '☾' : '☀';
   themeButton.setAttribute('aria-label', `Switch to ${theme === 'light' ? 'dark' : 'light'} theme`);
 }
+
 setTheme(localStorage.getItem('portal-theme') || 'dark');
 themeButton.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light'));
 
 supabaseClient.auth.onAuthStateChange((event, session) => {
   if (event === 'PASSWORD_RECOVERY') {
-    authView.classList.remove('hidden'); dashboardView.classList.add('hidden'); showAuthForm('new-password'); return;
+    authView.classList.remove('hidden');
+    dashboardView.classList.add('hidden');
+    showAuthForm('new-password');
+    return;
   }
-  if (session?.user) showDashboard(session.user); else showLoggedOutView();
+  if (session?.user) showDashboard(session.user);
+  else showLoggedOutView();
 });
 
 (async function initializePortal() {
   const { data, error } = await supabaseClient.auth.getSession();
-  if (error) { showLoggedOutView(); showMessage(error.message, 'error'); return; }
-  if (data.session?.user) showDashboard(data.session.user); else showLoggedOutView();
+  if (error) {
+    showLoggedOutView();
+    showMessage(error.message, 'error');
+    return;
+  }
+  if (data.session?.user) await showDashboard(data.session.user);
+  else showLoggedOutView();
 })();
