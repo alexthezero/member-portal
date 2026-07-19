@@ -9,12 +9,31 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .campfire-mark{position:relative;display:block;width:76px;height:76px;flex:0 0 auto;filter:drop-shadow(0 12px 20px rgba(255,101,25,.28))}
+    .campfire-mark.small{width:46px;height:46px;filter:drop-shadow(0 6px 12px rgba(255,101,25,.24))}
+    .campfire-glow{position:absolute;left:50%;bottom:11%;width:70%;height:48%;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(255,181,76,.48),rgba(255,86,17,.14) 50%,transparent 72%);filter:blur(7px);animation:campGlow 2.2s ease-in-out infinite alternate}
+    .campfire-flame{position:absolute;left:50%;bottom:22%;transform-origin:50% 100%;border-radius:58% 42% 64% 36%/70% 48% 52% 30%;transform:translateX(-50%) rotate(45deg);animation:campFlicker 1.25s ease-in-out infinite alternate}
+    .campfire-flame.outer{width:38%;height:50%;background:linear-gradient(135deg,#ffca68 0%,#ff7428 52%,#e63d11 100%);box-shadow:0 0 18px rgba(255,108,28,.72)}
+    .campfire-flame.middle{bottom:23%;width:27%;height:38%;background:linear-gradient(135deg,#fff0a6,#ffac36 58%,#ff5f1f);animation-delay:-.38s}
+    .campfire-flame.inner{bottom:24%;width:16%;height:25%;background:linear-gradient(135deg,#fffde1,#ffd56d 72%,#ff9c2f);animation-delay:-.72s}
+    .campfire-log{position:absolute;bottom:15%;left:50%;width:47%;height:9%;border-radius:999px;background:linear-gradient(90deg,#4e2819,#8b4c2b 45%,#4b2417);box-shadow:inset 0 1px rgba(255,202,139,.22);transform-origin:center}
+    .campfire-log.one{transform:translateX(-50%) rotate(18deg)}
+    .campfire-log.two{transform:translateX(-50%) rotate(-18deg)}
+    .campfire-spark{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffc15f;box-shadow:0 0 7px #ff7a24;opacity:0;animation:campSpark 2.6s linear infinite}
+    .campfire-spark.s1{left:32%;bottom:54%;animation-delay:-.4s}.campfire-spark.s2{left:62%;bottom:50%;animation-delay:-1.25s}.campfire-spark.s3{left:48%;bottom:60%;animation-delay:-2s}
+    .campfire-mark.small .campfire-spark{width:3px;height:3px}.campfire-mark.small .campfire-glow{filter:blur(4px)}
+    @keyframes campFlicker{0%{transform:translateX(-50%) rotate(41deg) scale(.93,1.04)}45%{transform:translateX(-50%) rotate(47deg) scale(1.03,.96)}100%{transform:translateX(-50%) rotate(43deg) scale(.97,1.08)}}
+    @keyframes campGlow{from{opacity:.55;transform:translateX(-50%) scale(.88)}to{opacity:1;transform:translateX(-50%) scale(1.1)}}
+    @keyframes campSpark{0%{opacity:0;transform:translate(0,0) scale(.5)}18%{opacity:1}75%{opacity:.65}100%{opacity:0;transform:translate(8px,-35px) scale(0)}}
+    @media(prefers-reduced-motion:reduce){.campfire-flame,.campfire-glow,.campfire-spark{animation:none}}
+  </style>
 </head>
 <body>
   <main class="page-shell">
     <section id="auth-view" class="auth-layout">
       <div class="brand-panel">
-        <div class="brand-mark" aria-hidden="true">🔥</div>
+        <div class="campfire-mark" aria-hidden="true"><span class="campfire-glow"></span><span class="campfire-spark s1"></span><span class="campfire-spark s2"></span><span class="campfire-spark s3"></span><span class="campfire-flame outer"></span><span class="campfire-flame middle"></span><span class="campfire-flame inner"></span><span class="campfire-log one"></span><span class="campfire-log two"></span></div>
         <p class="eyebrow">Private by design</p>
         <h1>Every family has stories.</h1>
         <p class="brand-copy">Campfire gives yours a warm, private place to share updates, preserve memories, and leave messages for the future.</p>
@@ -45,58 +64,18 @@
 
     <section id="dashboard-view" class="dashboard hidden">
       <header class="dashboard-header">
-        <div class="dashboard-brand"><div class="brand-mark small">🔥</div><div><p class="eyebrow">Our private family space</p><h1>Campfire</h1></div></div>
+        <div class="dashboard-brand"><div class="campfire-mark small" aria-hidden="true"><span class="campfire-glow"></span><span class="campfire-flame outer"></span><span class="campfire-flame middle"></span><span class="campfire-flame inner"></span><span class="campfire-log one"></span><span class="campfire-log two"></span></div><div><p class="eyebrow">Our private family space</p><h1>Campfire</h1></div></div>
         <div class="header-actions"><button id="theme-button" class="icon-button" type="button">☀</button><button id="logout-button" class="secondary-button" type="button">Log out</button></div>
       </header>
       <nav class="portal-nav">
-        <button class="nav-button active" data-section="feed">Campfire Feed</button>
-        <button class="nav-button" data-section="private">My Private Posts</button>
-        <button class="nav-button" data-section="capsules">Time Capsules</button>
-        <button class="nav-button" data-section="members">Family</button>
-        <button class="nav-button" data-section="profile">My Profile</button>
+        <button class="nav-button active" data-section="feed">Campfire Feed</button><button class="nav-button" data-section="private">My Private Posts</button><button class="nav-button" data-section="capsules">Time Capsules</button><button class="nav-button" data-section="members">Family</button><button class="nav-button" data-section="profile">My Profile</button>
       </nav>
       <div id="dashboard-message" class="message" role="status"></div>
-
-      <section id="section-feed" class="portal-section">
-        <div class="hero-card"><div><p class="eyebrow">Welcome home</p><h2 id="welcome-heading">Good evening.</h2><p>Share a story, photo, milestone, or update with the people who matter most.</p></div><div id="avatar-display" class="avatar-display">M</div></div>
-        <div class="content-grid">
-          <div>
-            <form id="post-form" class="composer card">
-              <textarea id="post-content" rows="4" maxlength="3000" required placeholder="What would you like to share with the family?"></textarea>
-              <div class="composer-actions"><select id="post-visibility"><option value="family">Family</option><option value="private">Only me</option></select><button class="primary-button" type="submit">Share post</button></div>
-            </form>
-            <div id="feed-list" class="feed-list"></div>
-          </div>
-          <aside class="side-stack">
-            <article class="card memory-card"><span class="card-icon">✨</span><p class="eyebrow">Memory Tonight</p><h3 id="memory-title">Your memories will appear here.</h3><p id="memory-copy" class="muted">As your Campfire grows, old posts will be resurfaced for the family.</p></article>
-            <article class="card"><p class="eyebrow">Coming up</p><h3>Family Gatherings</h3><p class="muted">Birthdays, reunions, anniversaries, and holidays will live here next.</p></article>
-          </aside>
-        </div>
-      </section>
-
+      <section id="section-feed" class="portal-section"><div class="hero-card"><div><p class="eyebrow">Welcome home</p><h2 id="welcome-heading">Good evening.</h2><p>Share a story, photo, milestone, or update with the people who matter most.</p></div><div id="avatar-display" class="avatar-display">M</div></div><div class="content-grid"><div><form id="post-form" class="composer card"><textarea id="post-content" rows="4" maxlength="3000" required placeholder="What would you like to share with the family?"></textarea><div class="composer-actions"><select id="post-visibility"><option value="family">Family</option><option value="private">Only me</option></select><button class="primary-button" type="submit">Share post</button></div></form><div id="feed-list" class="feed-list"></div></div><aside class="side-stack"><article class="card memory-card"><span class="card-icon">✨</span><p class="eyebrow">Memory Tonight</p><h3 id="memory-title">Your memories will appear here.</h3><p id="memory-copy" class="muted">As your Campfire grows, old posts will be resurfaced for the family.</p></article><article class="card"><p class="eyebrow">Coming up</p><h3>Family Gatherings</h3><p class="muted">Birthdays, reunions, anniversaries, and holidays will live here next.</p></article></aside></div></section>
       <section id="section-private" class="portal-section hidden"><div class="section-heading"><div><p class="eyebrow">Only you can see these</p><h2>My Private Posts</h2></div></div><div id="private-list" class="feed-list narrow"></div></section>
-
-      <section id="section-capsules" class="portal-section hidden">
-        <div class="section-heading"><div><p class="eyebrow">Messages for the future</p><h2>Time Capsules</h2><p class="muted">Write something meaningful today and choose when it may be opened.</p></div></div>
-        <div class="capsule-layout">
-          <form id="capsule-form" class="card settings-card">
-            <div><label for="capsule-title">Capsule title</label><input id="capsule-title" required maxlength="120" placeholder="For Emery on her 18th birthday"></div>
-            <div><label for="capsule-message">Message</label><textarea id="capsule-message" rows="7" required maxlength="10000" placeholder="Write a letter, memory, story, or piece of advice..."></textarea></div>
-            <div class="two-col"><div><label for="capsule-recipient">Recipient</label><input id="capsule-recipient" maxlength="120" placeholder="Name or whole family"></div><div><label for="capsule-date">Unlock date</label><input id="capsule-date" type="date" required></div></div>
-            <button class="primary-button" type="submit">Seal Time Capsule</button>
-          </form>
-          <div><div id="capsule-list" class="capsule-list"></div></div>
-        </div>
-      </section>
-
+      <section id="section-capsules" class="portal-section hidden"><div class="section-heading"><div><p class="eyebrow">Messages for the future</p><h2>Time Capsules</h2><p class="muted">Write something meaningful today and choose when it may be opened.</p></div></div><div class="capsule-layout"><form id="capsule-form" class="card settings-card"><div><label for="capsule-title">Capsule title</label><input id="capsule-title" required maxlength="120" placeholder="For Emery on her 18th birthday"></div><div><label for="capsule-message">Message</label><textarea id="capsule-message" rows="7" required maxlength="10000" placeholder="Write a letter, memory, story, or piece of advice..."></textarea></div><div class="two-col"><div><label for="capsule-recipient">Recipient</label><input id="capsule-recipient" maxlength="120" placeholder="Name or whole family"></div><div><label for="capsule-date">Unlock date</label><input id="capsule-date" type="date" required></div></div><button class="primary-button" type="submit">Seal Time Capsule</button></form><div><div id="capsule-list" class="capsule-list"></div></div></div></section>
       <section id="section-members" class="portal-section hidden"><div class="section-heading"><div><p class="eyebrow">Around the fire</p><h2>Family Members</h2></div></div><div id="member-list" class="member-grid"></div></section>
-
-      <section id="section-profile" class="portal-section hidden">
-        <div class="section-heading"><div><p class="eyebrow">Your place in the family</p><h2>My Profile</h2></div></div>
-        <div class="profile-layout"><aside class="profile-preview card"><div id="profile-avatar-preview" class="avatar-display large">M</div><h3 id="profile-preview-name">Member</h3><p id="profile-preview-email" class="muted"></p></aside>
-          <form id="profile-form" class="settings-card card"><div><label for="profile-name">Display name</label><input id="profile-name" required maxlength="80"></div><div><label>Profile picture</label><div class="photo-upload-row"><label for="profile-avatar-file" class="upload-button">Choose photo</label><input id="profile-avatar-file" class="visually-hidden" type="file" accept="image/*"><span id="selected-file-name" class="muted">No photo selected</span></div><button id="remove-profile-photo" class="text-button hidden" type="button">Remove photo</button></div><div><label for="profile-email">Email</label><input id="profile-email" disabled></div><button class="primary-button" type="submit">Save profile</button></form>
-        </div>
-      </section>
+      <section id="section-profile" class="portal-section hidden"><div class="section-heading"><div><p class="eyebrow">Your place in the family</p><h2>My Profile</h2></div></div><div class="profile-layout"><aside class="profile-preview card"><div id="profile-avatar-preview" class="avatar-display large">M</div><h3 id="profile-preview-name">Member</h3><p id="profile-preview-email" class="muted"></p></aside><form id="profile-form" class="settings-card card"><div><label for="profile-name">Display name</label><input id="profile-name" required maxlength="80"></div><div><label>Profile picture</label><div class="photo-upload-row"><label for="profile-avatar-file" class="upload-button">Choose photo</label><input id="profile-avatar-file" class="visually-hidden" type="file" accept="image/*"><span id="selected-file-name" class="muted">No photo selected</span></div><button id="remove-profile-photo" class="text-button hidden" type="button">Remove photo</button></div><div><label for="profile-email">Email</label><input id="profile-email" disabled></div><button class="primary-button" type="submit">Save profile</button></form></div></section>
     </section>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
