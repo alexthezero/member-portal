@@ -75,16 +75,8 @@
 }
 
 .brand-name::after {
-  content: "" !important;
-  position: absolute !important;
-  left: 57% !important;
-  bottom: -.12em !important;
-  width: 1.25em !important;
-  height: .08em !important;
-  border-radius: 999px !important;
-  background: linear-gradient(90deg, transparent, #ffad55 22%, #ffe0a2 55%, transparent) !important;
-  transform: translateX(-50%) rotate(-3deg) !important;
-  box-shadow: 0 0 16px rgba(255,130,44,.34) !important;
+  content: none !important;
+  display: none !important;
 }
 
 .hero-copy {
